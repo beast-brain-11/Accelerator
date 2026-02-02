@@ -150,6 +150,36 @@ iverilog -o conv_tb ConvEngine_tb.v ConvEngine.v MUX.v Register.v Wallace.v
 vvp conv_tb
 ```
 
+### Expected Output
+
+```
+========================================
+  ConvEngine Testbench
+========================================
+
+--- Test 1: Identity kernel at center ---
+PASS: Result = 10 (expected 10)
+
+--- Test 2: All ones kernel ---
+PASS: Result = 45 (expected 45)
+
+--- Test 3: Signed multiplication ---
+PASS: Result = 9 (expected 9)
+
+--- Test 4: Mixed signed values ---
+PASS: Result = -1143 (expected -1143)
+
+--- Test 5: Accumulation test ---
+PASS: Result = 180 (expected 180)
+
+--- Test 6: Edge detection kernel (Sobel-like) ---
+PASS: Result = 0 (expected 0)
+
+========================================
+  Testbench Complete
+========================================
+```
+
 ## Test Cases
 
 The testbench includes:

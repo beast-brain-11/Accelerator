@@ -11,11 +11,16 @@ module ConvEngine (
        MUX Output Wires
        Format: [24:1] = 24-bit data, [0] = enable
     ----------------------------- */
-    wire [24:0] mux_out [5:0];
+    wire [24:0] mux_out0, mux_out1, mux_out2, mux_out3, mux_out4, mux_out5;
 
     MUX demux (
         .DMAport(DMAport),
-        .out(mux_out)
+        .out0(mux_out0),
+        .out1(mux_out1),
+        .out2(mux_out2),
+        .out3(mux_out3),
+        .out4(mux_out4),
+        .out5(mux_out5)
     );
 
     /* -----------------------------
@@ -35,47 +40,53 @@ module ConvEngine (
     wire [23:0] reg_data [5:0];
 
     // MUX outputs 0-5 → Registers 0-5
-    // mux_out[i][24:1] = data, mux_out[i][0] = enable
+    // mux_out[24:1] = data, mux_out[0] = enable
     
     Register reg0 (
         .clk(clk),
-        .enable(mux_out[0][0]),
-        .datain(mux_out[0][24:1]),
+        .rst(rst),
+        .enable(mux_out0[0]),
+        .datain(mux_out0[24:1]),
         .dataout(reg_data[0])
     );
 
     Register reg1 (
         .clk(clk),
-        .enable(mux_out[1][0]),
-        .datain(mux_out[1][24:1]),
+        .rst(rst),
+        .enable(mux_out1[0]),
+        .datain(mux_out1[24:1]),
         .dataout(reg_data[1])
     );
 
     Register reg2 (
         .clk(clk),
-        .enable(mux_out[2][0]),
-        .datain(mux_out[2][24:1]),
+        .rst(rst),
+        .enable(mux_out2[0]),
+        .datain(mux_out2[24:1]),
         .dataout(reg_data[2])
     );
 
     Register reg3 (
         .clk(clk),
-        .enable(mux_out[3][0]),
-        .datain(mux_out[3][24:1]),
+        .rst(rst),
+        .enable(mux_out3[0]),
+        .datain(mux_out3[24:1]),
         .dataout(reg_data[3])
     );
 
     Register reg4 (
         .clk(clk),
-        .enable(mux_out[4][0]),
-        .datain(mux_out[4][24:1]),
+        .rst(rst),
+        .enable(mux_out4[0]),
+        .datain(mux_out4[24:1]),
         .dataout(reg_data[4])
     );
 
     Register reg5 (
         .clk(clk),
-        .enable(mux_out[5][0]),
-        .datain(mux_out[5][24:1]),
+        .rst(rst),
+        .enable(mux_out5[0]),
+        .datain(mux_out5[24:1]),
         .dataout(reg_data[5])
     );
 
