@@ -43,9 +43,13 @@ module Wallace_BaughWooley (
 
     /* -----------------------------
        Wallace Tree – CSA Stages
+       8 PPs + bias → reduce to 2 operands
     ----------------------------- */
+    
+    // Stage 1: 8 + 1(bias) = 9 inputs → 6 outputs (3 CSAs)
     wire [15:0] s1_0, c1_0;
     wire [15:0] s1_1, c1_1;
+    wire [15:0] s1_2, c1_2;
 
     assign s1_0 = P[0] ^ P[1] ^ P[2];
     assign c1_0 = ((P[0] & P[1]) | (P[1] & P[2]) | (P[0] & P[2])) << 1;
@@ -53,20 +57,31 @@ module Wallace_BaughWooley (
     assign s1_1 = P[3] ^ P[4] ^ P[5];
     assign c1_1 = ((P[3] & P[4]) | (P[4] & P[5]) | (P[3] & P[5])) << 1;
 
+    assign s1_2 = P[6] ^ P[7] ^ bias;
+    assign c1_2 = ((P[6] & P[7]) | (P[7] & bias) | (P[6] & bias)) << 1;
+
+    // Stage 2: 6 inputs → 4 outputs (2 CSAs)
     wire [15:0] s2_0, c2_0;
+    wire [15:0] s2_1, c2_1;
 
     assign s2_0 = s1_0 ^ c1_0 ^ s1_1;
     assign c2_0 = ((s1_0 & c1_0) | (c1_0 & s1_1) | (s1_0 & s1_1)) << 1;
 
+    assign s2_1 = c1_1 ^ s1_2 ^ c1_2;
+    assign c2_1 = ((c1_1 & s1_2) | (s1_2 & c1_2) | (c1_1 & c1_2)) << 1;
+
+    // Stage 3: 4 inputs → 3 outputs (1 CSA + 1 passthrough)
     wire [15:0] s3_0, c3_0;
 
-    assign s3_0 = s2_0 ^ c2_0 ^ P[6];
-    assign c3_0 = ((s2_0 & c2_0) | (c2_0 & P[6]) | (s2_0 & P[6])) << 1;
+    assign s3_0 = s2_0 ^ c2_0 ^ s2_1;
+    assign c3_0 = ((s2_0 & c2_0) | (c2_0 & s2_1) | (s2_0 & s2_1)) << 1;
+    // c2_1 passes through
 
+    // Stage 4: 3 inputs → 2 outputs (1 CSA)
     wire [15:0] final_sum, final_carry;
 
-    assign final_sum   = s3_0 ^ c3_0 ^ P[7] ^ bias;
-    assign final_carry = ((s3_0 & c3_0) | (c3_0 & P[7]) | (s3_0 & P[7])) << 1;
+    assign final_sum   = s3_0 ^ c3_0 ^ c2_1;
+    assign final_carry = ((s3_0 & c3_0) | (c3_0 & c2_1) | (s3_0 & c2_1)) << 1;
 
     /* -----------------------------
        Final Carry Propagate Adder
